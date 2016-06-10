@@ -240,7 +240,7 @@ class alcMetabox {
     }
     foreach ( $this->metabox->fields as $field ) {
       $label = '<label for="' . $field['id'] . '">' . $field['label'] . '</label>';
-      if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
+
       $db_value = get_post_meta( $post->ID, $this->metabox->slug . '_' . $field['id'], true );
       switch ( $field['type'] ) {
         case 'checkbox':
@@ -250,6 +250,7 @@ class alcMetabox {
             $field['id'],
             $field['id']
           );
+          if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
           break;
         case 'media':
           $input = sprintf(
@@ -261,6 +262,7 @@ class alcMetabox {
             $field['id'],
             $field['id']
           );
+          if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
           break;
         case 'textarea':
           $input = sprintf(
@@ -269,6 +271,7 @@ class alcMetabox {
             $field['id'],
             $db_value
           );
+          if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
           break;
 
         // case 'user': search user by name or email
@@ -284,7 +287,7 @@ class alcMetabox {
             $db_value
           );
       }
-      $output .= $this->row_format( $label, $input );
+      $output .= $this->row_format( $label, $input, $field['type'] );
     }
     echo $this->container( $output );
   }
@@ -292,10 +295,12 @@ class alcMetabox {
   /**
    * Generates the HTML for rows.
    */
-  public function row_format( $label, $input ) {
+  public function row_format( $label, $input, $type = false ) {
     switch ($this->metabox->context) {
       case 'side':
-        $output = '<p>' . $label . '<br>' . $input . '</p>'; 
+        $output = '<p>' . $input . ' '; 
+        $output .= ($type != 'checkbox') ? '<br>' : '' ; 
+        $output .= $label . '</p>'; 
         break;
       
       default:
@@ -359,7 +364,7 @@ class alcMetabox {
 }
 
 foreach ($metaboxes as $metabox) {
-  new alcMetabox($metaboxe);
+  new alcMetabox($metabox);
 }
 // new alcMetabox($metaboxes['alc_profile']);
 // new alcMetabox($metaboxes['alc_holders']);

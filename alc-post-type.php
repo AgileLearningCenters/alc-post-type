@@ -74,6 +74,8 @@ function alc_learning_center_post_type() {
   register_post_type( 'alc', $args );
 
 }
+
 add_action( 'init', 'alc_learning_center_post_type', 0 );
 
-include 'alc-post-type-metabox.php';
+require 'alc-post-type-metabox.php';
+require 'alc-post-type-taxonomy.php';
