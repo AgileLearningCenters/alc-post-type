@@ -234,10 +234,8 @@ class alcMetabox {
    */
   public function generate_fields( $post ) {
     $output = '';
-    $class = 'regular-text';
-    if ($this->metabox->context == 'side') {
-      $class = '';
-    }
+    $class = ($this->metabox->context != 'side') ? 'regular-text' : '' ;
+    
     foreach ( $this->metabox->fields as $field ) {
       $label = '<label for="' . $field['id'] . '">' . $field['label'] . '</label>';
 
