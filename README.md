@@ -4,6 +4,7 @@ This plugin creates an ALC Post Type for tracking and displaying ALCs
 
 ## TODO
 
+- Auto geocode incoming forms?
 - Add logo metabox
  - Resize images into multiple sizes
 - Add example of the map box

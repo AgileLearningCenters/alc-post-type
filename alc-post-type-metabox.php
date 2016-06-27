@@ -12,16 +12,6 @@ $metaboxes = array(
     'screens'      => $screens,
     'fields'      => array(
       array(
-        'id' => 'name',
-        'label' => __( 'Name', 'alc_text' ),
-        'type' => 'text',
-      ),
-      array(
-        'id' => 'description',
-        'label' => __( 'Description', 'alc_text' ),
-        'type' => 'textarea',
-      ),
-      array(
         'id' => 'address',
         'label' => __( 'Address', 'alc_text' ),
         'type' => 'text',
@@ -35,16 +25,6 @@ $metaboxes = array(
         'id' => 'age_range',
         'label' => __( 'Age Range', 'alc_text' ),
         'type' => 'text',
-      ),
-      array(
-        'id' => 'enrollment_application_link',
-        'label' => __( 'Enrollment Application Link', 'alc_text' ),
-        'type' => 'url',
-      ),
-      array(
-        'id' => 'date_of_establishment',
-        'label' => __( 'Date of Establishment', 'alc_text' ),
-        'type' => 'date',
       ),
       array(
         'id' => 'facebook',
@@ -82,24 +62,9 @@ $metaboxes = array(
         'type'  => 'phone',
       ),
       array(
-        'id'    => 'secondary_name',
-        'label' => __( 'Name secondary', 'alc_text' ),
-        'type'  => 'name',
-      ),
-      array(
-        'id'    => 'secondary_email',
-        'label' => __( 'Email secondary', 'alc_text' ),
-        'type'  => 'email',
-      ),
-      array(
-        'id'    => 'secondary_phone',
-        'label' => __( 'Phone secondary', 'alc_text' ),
-        'type'  => 'phone',
-      ),
-      array(
         'id'    => 'other_contacts',
         'label' => __( 'Other Contacts', 'alc_text' ),
-        'desc'  => 'Place each contact on a new line, separate name,email,phone with commas',
+        'desc'  => 'Place each contact on a new line, separate name|email|phone with pipes',
         'type'  => 'textarea',
       ),
     )
@@ -118,42 +83,37 @@ $metaboxes = array(
         'type'  => 'checkbox',
       ),
       array(
-        'id'    => 'map_name',
+        'id'    => 'name',
         'label' => __( 'Map Name', 'alc_text' ),
         'type'  => 'text',
       ),
       array(
-        'id'    => 'map_description',
+        'id'    => 'description',
         'label' => __( 'Map Description', 'alc_text' ),
         'type'  => 'textarea',
       ),
       array(
-        'id'    => 'geocode',
-        'label' => __( 'Pin Location', 'alc_text' ),
-        'type'  => 'geocode',
+        'id' => 'cta_label',
+        'label' => __( 'Call to Action Label', 'alc_text' ),
+        'type' => 'text',
       ),
       array(
-        'id' => 'website',
-        'label' => __( 'Website', 'alc_text' ),
+        'id' => 'cta',
+        'label' => __( 'Call to Action Link', 'alc_text' ),
         'type' => 'url',
       ),
       array(
-        'id' => 'public_contact_address',
-        'label' => __( 'Public Contact Address', 'alc_text' ),
-        'type' => 'address',
-      ),
-      array(
-        'id' => 'public_contact_name',
+        'id' => 'contact_name',
         'label' => __( 'Public Contact Name', 'alc_text' ),
         'type' => 'text',
       ),
       array(
-        'id' => 'public_contact_email',
+        'id' => 'contact_email',
         'label' => __( 'Public Contact Email', 'alc_text' ),
         'type' => 'email',
       ),
       array(
-        'id' => 'public_contact_phone',
+        'id' => 'contact_phone',
         'label' => __( 'Public Contact Phone', 'alc_text' ),
         'type' => 'phone',
       )
