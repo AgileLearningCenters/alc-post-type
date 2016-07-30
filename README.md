@@ -13,6 +13,14 @@ This plugin creates an ALC Post Type for tracking and displaying ALCs
  - Filter by upcoming renewal
 - Associate ALC Post with Site and display edit page on site's admin settings
 
+## How to: Update gravity form
+
+Make changes to the gravity form on a dev server, test them then export the forms settings.
+
+Replace `gravity-form-template.json` and commit.
+
+Import new form to live website.
+
 ## Structure
 
 - alc_profile
@@ -21,11 +29,11 @@ This plugin creates an ALC Post Type for tracking and displaying ALCs
  - alc_profile_website
  - alc_profile_facebook
  - alc_profile_twitter
- - alc_profile_alc_holders
- - alc_profile_primary_name
- - alc_profile_primary_email
- - alc_profile_primary_phone
- - alc_profile_other_contacts
+- alc_holders
+ - alc_holders_primary_name
+ - alc_holders_primary_email
+ - alc_holders_primary_phone
+ - alc_holders_other_contacts
 - alc_map_info
  - alc_map_info_on_map
  - alc_map_info_name
