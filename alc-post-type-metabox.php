@@ -138,7 +138,7 @@ $metaboxes = array(
       array(
         'id' => 'last_payment_date',
         'label' => __( 'Last Payment Date', 'alc_text' ),
-        'type' => 'date',
+        'type' => 'text',
       ),
       array(
         'id' => 'harbor_pilot',
@@ -148,7 +148,7 @@ $metaboxes = array(
       array(
         'id' => 'join_date',
         'label' => __( 'Join Date', 'alc_text' ),
-        'type' => 'date',
+        'type' => 'text',
       )
     )
   ),
