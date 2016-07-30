@@ -15,45 +15,42 @@ This plugin creates an ALC Post Type for tracking and displaying ALCs
 
 ## Structure
 
-Agile Learning Center
-alc-profile
-- Name (title)
-- Description
-- Address
-- Website
-- Age Range
-- Enrollment Application Link
-- Date of Establishment
-- Social Media
- - Facebook
- - Twitter
-
-Map Info
-alc-card
-- Show on Map
-- Map Name
-- Map Description
-- geocode
-- Website
-- Public Contact Address
-- Public Contact Name
-- Public Contact Email
-- Public Contact Phone
-
-ALC Membership
-alc-membership
-- Last Payment Date
-- Network Holder
-- Start Date
+- alc_profile
+ - alc_profile_age_range
+ - alc_profile_address
+ - alc_profile_website
+ - alc_profile_facebook
+ - alc_profile_twitter
+ - alc_profile_alc_holders
+ - alc_profile_primary_name
+ - alc_profile_primary_email
+ - alc_profile_primary_phone
+ - alc_profile_other_contacts
+- alc_map_info
+ - alc_map_info_on_map
+ - alc_map_info_name
+ - alc_map_info_description
+ - alc_map_info_cta_label
+ - alc_map_info_cta
+ - alc_map_info_contact_name
+ - alc_map_info_contact_email
+ - alc_map_info_contact_phone
+- alc_membership
+ - alc_membership_active
+ - alc_membership_last_payment_date
+ - alc_membership_harbor_pilot
+ - alc_membership_join_date
+- alc_exchange
+ - alc_exchange_students
+ - alc_exchange_alf
+ - alc_exchange_description
 
 Standing Taxonomy
 alc-standing
-- Paid
-- Delinquent
-- Defunked
+- Steps in ALC Health
 
 Type Taxonomy
 alc-type
 - Startup
 - Using Tools
-- Full
+- Converting (from another model)

@@ -12,6 +12,11 @@ $metaboxes = array(
     'screens'      => $screens,
     'fields'      => array(
       array(
+        'id' => 'age_range',
+        'label' => __( 'Age Range Served', 'alc_text' ),
+        'type' => 'text',
+      ),
+      array(
         'id' => 'address',
         'label' => __( 'Address', 'alc_text' ),
         'type' => 'text',
@@ -22,18 +27,15 @@ $metaboxes = array(
         'type' => 'url',
       ),
       array(
-        'id' => 'age_range',
-        'label' => __( 'Age Range', 'alc_text' ),
-        'type' => 'text',
-      ),
-      array(
         'id' => 'facebook',
-        'label' => __( 'Facebook', 'alc_text' ),
+        'label' => __( 'Facebook Page URL', 'alc_text' ),
+        'desc'  => __( 'Full URL to your facebook page. Example: https://www.facebook.com/NYCAgile/', 'alc_text' ),
         'type' => 'url',
       ),
       array(
         'id' => 'twitter',
-        'label' => __( 'Twitter', 'alc_text' ),
+        'label' => __( 'Twitter URL', 'alc_text' ),
+        'desc'  => __( 'Full URL to your twitter profile. Example: https://twitter.com/ALCnetwork', 'alc_text' ),
         'type' => 'url',
       )
     )
@@ -64,7 +66,7 @@ $metaboxes = array(
       array(
         'id'    => 'other_contacts',
         'label' => __( 'Other Contacts', 'alc_text' ),
-        'desc'  => 'Place each contact on a new line, separate name|email|phone with pipes',
+        'desc'  => __( 'Place each contact on a new line, separate name|email|phone with pipes', 'alc_text' ),
         'type'  => 'textarea',
       ),
     )
@@ -139,14 +141,39 @@ $metaboxes = array(
         'type' => 'date',
       ),
       array(
-        'id' => 'network_holder',
-        'label' => __( 'Network Holder', 'alc_text' ),
+        'id' => 'harbor_pilot',
+        'label' => __( 'Harbor Pilot', 'alc_text' ),
         'type' => 'user',
       ),
       array(
-        'id' => 'start_date',
-        'label' => __( 'Start Date', 'alc_text' ),
+        'id' => 'join_date',
+        'label' => __( 'Join Date', 'alc_text' ),
         'type' => 'date',
+      )
+    )
+  ),
+  'alc_exchange' => array(
+    'title'       => __( 'Exchange', 'alc_text' ),
+    'slug'        => 'alc_exchange',
+    'description' => __( 'ALC exchange program information for visiting students and ROAR ALFs', 'alc_text' ),
+    'context'     => 'normal',
+    'priority'    => 'high',
+    'screens'      => $screens,
+    'fields'      => array(
+      array(
+        'id'    => 'students',
+        'label' => __( 'Accepting student exchange?', 'alc_text' ),
+        'type'  => 'checkbox'
+      ),
+      array(
+        'id'    => 'alf',
+        'label' => __( 'Accepting ALF exchange?', 'alc_text' ),
+        'type'  => 'checkbox'
+      ),
+      array(
+        'id' => 'description',
+        'label' => __( 'Details about your exchange program', 'alc_text' ),
+        'type' => 'textarea',
       )
     )
   )
