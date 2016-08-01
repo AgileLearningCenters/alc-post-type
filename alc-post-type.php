@@ -54,7 +54,7 @@ function alc_learning_center_post_type() {
     'label'                 => __( 'ALCs', 'alc_text' ),
     'description'           => __( 'Agile Learning Center', 'alc_text' ),
     'labels'                => $labels,
-    'supports'              => array( 'title', 'editor', 'excerpt', 'thumbnail', 'comments', 'revisions', ),
+    'supports'              => array( 'title', 'editor', 'author', 'excerpt', 'thumbnail', 'comments', 'revisions', ),
     'taxonomies'            => array( 'alc_type' ),
     'hierarchical'          => true,
     'public'                => true,
