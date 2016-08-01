@@ -45,6 +45,7 @@ Import new form to live website.
  - alc_map_info_contact_phone
 - alc_membership
  - alc_membership_active
+ - alc_membership_enrollments
  - alc_membership_last_payment_date
  - alc_membership_harbor_pilot
  - alc_membership_join_date

@@ -136,6 +136,11 @@ $metaboxes = array(
         'desc'  => 'Is the ALC operating?',
       ),
       array(
+        'id' => 'enrollments',
+        'label' => __( 'How many students are enrolled?', 'alc_text' ),
+        'type' => 'number',
+      ),
+      array(
         'id' => 'last_payment_date',
         'label' => __( 'Last Payment Date', 'alc_text' ),
         'type' => 'text',
