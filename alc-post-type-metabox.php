@@ -136,8 +136,18 @@ $metaboxes = array(
         'desc'  => 'Is the ALC operating?',
       ),
       array(
+        'id'    => 'paid',
+        'label' => __( 'Paid?', 'alc_text' ),
+        'type'  => 'checkbox'
+      ),
+      array(
         'id' => 'enrollments',
         'label' => __( 'How many students are enrolled?', 'alc_text' ),
+        'type' => 'number',
+      ),
+      array(
+        'id' => 'dues_usd',
+        'label' => __( 'Membership Dues USD', 'alc_text' ),
         'type' => 'number',
       ),
       array(
