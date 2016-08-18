@@ -12,11 +12,6 @@ $metaboxes = array(
     'screens'      => $screens,
     'fields'      => array(
       array(
-        'id' => 'age_range',
-        'label' => __( 'Age Range Served', 'alc_text' ),
-        'type' => 'text',
-      ),
-      array(
         'id' => 'address',
         'label' => __( 'Address', 'alc_text' ),
         'type' => 'text',
@@ -68,6 +63,37 @@ $metaboxes = array(
         'label' => __( 'Other Contacts', 'alc_text' ),
         'desc'  => __( 'Place each contact on a new line, separate name|email|phone with pipes', 'alc_text' ),
         'type'  => 'textarea',
+      ),
+    )
+  ),
+  'alc_org' => array(
+    'title'       => __( 'Organization', 'alc_text' ),
+    'slug'        => 'alc_org',
+    'description' => __( 'Information about the organization', 'alc_text' ),
+    'context'     => 'normal',
+    'priority'    => 'high',
+    'screens'      => $screens,
+    'fields'      => array(
+      array(
+        'id' => 'age_range',
+        'label' => __( 'Age Range Served', 'alc_text' ),
+        'type' => 'text'
+      ),
+      array(
+        'id'    => 'open_hours',
+        'label' => __( 'Hours of operation', 'alc_text' ),
+        'type'  => 'text'
+      ),
+      array(
+        'id'    => 'open_days',
+        'label' => __( 'Days of week open', 'alc_text' ),
+        'type'  => 'text'
+      ),
+      array(
+        'id'    => 'enrollment_type',
+        'label' => __( 'Enrollment Type', 'alc_text' ),
+        'type'  => 'text',
+        'desc'  => __( 'type "open" for open enrollment', 'alc_text' ),
       ),
     )
   ),
