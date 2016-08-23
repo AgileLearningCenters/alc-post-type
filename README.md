@@ -40,6 +40,7 @@ Import new form to live website.
  - alc_org_enrollment_type
 - alc_map_info
  - alc_map_info_on_map
+ - alc_map_info_geocode
  - alc_map_info_name
  - alc_map_info_description
  - alc_map_info_cta_label

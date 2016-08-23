@@ -111,6 +111,12 @@ $metaboxes = array(
         'type'  => 'checkbox',
       ),
       array(
+        'id'    => 'geocode',
+        'label' => __( 'Geocode', 'alc_text' ),
+        'type'  => 'geocode',
+        'desc'  => __( 'Lat & Long of the map icon, generate from address.', 'alc_text' )
+      ),
+      array(
         'id'    => 'name',
         'label' => __( 'Map Name', 'alc_text' ),
         'type'  => 'text',
@@ -302,7 +308,17 @@ class alcMetabox {
 
         // case 'user': search user by name or email
         // case 'address': search address
-        // case 'geocode': enter address and geocode entry into hidden field
+        case 'geocode':
+          $input = sprintf(
+            '<input class="%s" id="%s" name="%s" type="text" value="%s">',
+            $class,
+            $field['id'],
+            $field['id'],
+            $db_value
+          );
+          $input .= '<br><a class="button" id="geocodeButton">' . __( 'Geocode Address', 'alc_text' ) . '</a>';
+          if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
+          break;
         default:
           $input = sprintf(
             '<input %s id="%s" name="%s" type="%s" value="%s">',
