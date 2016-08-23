@@ -26,6 +26,21 @@
 
     }
 
+    function alcStaticMapURL(geocode){
+      var baseurl = 'https://maps.googleapis.com/maps/api/staticmap',
+          apikey = 'AIzaSyCXre9Yr0X1YQpFZJpXWIWN8ZOVTHZUjvU';
+      var mapObject = {
+        'center':geocode,
+        'size':'600x200',
+        'zoom':'8',
+        'maptype':'roadmap',
+        'markers':'color:blue|label:A|' + geocode,
+        'key':apikey
+      };
+
+      return baseurl + '?' + $.param( mapObject );
+    }
+
     $('#geocodeButton').click(function(){
       alcGeocodeAddress();
     });

@@ -1,6 +1,7 @@
 <?php 
 
 $geocodeAPIKey = 'AIzaSyDUkTyad56hKDcQaCOJOWDsundLnWFI3Fc';
+$staticMapAPIKey = 'AIzaSyCXre9Yr0X1YQpFZJpXWIWN8ZOVTHZUjvU';
 
 function alc_post_type_admin_script() {
     global $post_type, $geocodeAPIKey;
