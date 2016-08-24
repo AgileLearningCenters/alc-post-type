@@ -12,11 +12,6 @@ $metaboxes = array(
     'screens'      => $screens,
     'fields'      => array(
       array(
-        'id' => 'age_range',
-        'label' => __( 'Age Range Served', 'alc_text' ),
-        'type' => 'text',
-      ),
-      array(
         'id' => 'address',
         'label' => __( 'Address', 'alc_text' ),
         'type' => 'text',
@@ -71,6 +66,37 @@ $metaboxes = array(
       ),
     )
   ),
+  'alc_org' => array(
+    'title'       => __( 'Organization', 'alc_text' ),
+    'slug'        => 'alc_org',
+    'description' => __( 'Information about the organization', 'alc_text' ),
+    'context'     => 'normal',
+    'priority'    => 'high',
+    'screens'      => $screens,
+    'fields'      => array(
+      array(
+        'id' => 'age_range',
+        'label' => __( 'Age Range Served', 'alc_text' ),
+        'type' => 'text'
+      ),
+      array(
+        'id'    => 'open_hours',
+        'label' => __( 'Hours of operation', 'alc_text' ),
+        'type'  => 'text'
+      ),
+      array(
+        'id'    => 'open_days',
+        'label' => __( 'Days of week open', 'alc_text' ),
+        'type'  => 'text'
+      ),
+      array(
+        'id'    => 'enrollment_type',
+        'label' => __( 'Enrollment Type', 'alc_text' ),
+        'type'  => 'text',
+        'desc'  => __( 'type "open" for open enrollment', 'alc_text' ),
+      ),
+    )
+  ),
   'alc_map_info' => array(
     'title'       => __( 'Map Info', 'alc_text' ),
     'slug'        => 'alc_map_info',
@@ -83,6 +109,12 @@ $metaboxes = array(
         'id'    => 'on_map',
         'label' => __( 'On Map?', 'alc_text' ),
         'type'  => 'checkbox',
+      ),
+      array(
+        'id'    => 'geocode',
+        'label' => __( 'Geocode', 'alc_text' ),
+        'type'  => 'geocode',
+        'desc'  => __( 'Lat & Long of the map icon, generate from address.', 'alc_text' )
       ),
       array(
         'id'    => 'name',
@@ -136,8 +168,18 @@ $metaboxes = array(
         'desc'  => 'Is the ALC operating?',
       ),
       array(
+        'id'    => 'paid',
+        'label' => __( 'Paid?', 'alc_text' ),
+        'type'  => 'checkbox'
+      ),
+      array(
         'id' => 'enrollments',
         'label' => __( 'How many students are enrolled?', 'alc_text' ),
+        'type' => 'number',
+      ),
+      array(
+        'id' => 'dues_usd',
+        'label' => __( 'Membership Dues USD', 'alc_text' ),
         'type' => 'number',
       ),
       array(
@@ -266,7 +308,17 @@ class alcMetabox {
 
         // case 'user': search user by name or email
         // case 'address': search address
-        // case 'geocode': enter address and geocode entry into hidden field
+        case 'geocode':
+          $input = sprintf(
+            '<input class="%s" id="%s" name="%s" type="text" value="%s">',
+            $class,
+            $field['id'],
+            $field['id'],
+            $db_value
+          );
+          $input .= '<br><a class="button" id="geocodeButton">' . __( 'Geocode Address', 'alc_text' ) . '</a>';
+          if ( $field['desc'] ) $label .= '<p>' . $field['desc'] . '</p>';
+          break;
         default:
           $input = sprintf(
             '<input %s id="%s" name="%s" type="%s" value="%s">',

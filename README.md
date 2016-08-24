@@ -24,7 +24,6 @@ Import new form to live website.
 ## Structure
 
 - alc_profile
- - alc_profile_age_range
  - alc_profile_address
  - alc_profile_website
  - alc_profile_facebook
@@ -34,8 +33,14 @@ Import new form to live website.
  - alc_holders_primary_email
  - alc_holders_primary_phone
  - alc_holders_other_contacts
+- alc_org
+ - alc_org_age_range
+ - alc_org_open_hours
+ - alc_org_open_days
+ - alc_org_enrollment_type
 - alc_map_info
  - alc_map_info_on_map
+ - alc_map_info_geocode
  - alc_map_info_name
  - alc_map_info_description
  - alc_map_info_cta_label
@@ -45,7 +50,9 @@ Import new form to live website.
  - alc_map_info_contact_phone
 - alc_membership
  - alc_membership_active
+ - alc_membership_paid
  - alc_membership_enrollments
+ - alc_membership_dues_usd
  - alc_membership_last_payment_date
  - alc_membership_harbor_pilot
  - alc_membership_join_date
