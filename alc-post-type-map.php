@@ -77,7 +77,7 @@ function alc_member_map_shortcode( $atts ) {
         var targetDiv = '<?php echo $id ?>',
             settings = <?php echo json_encode($a) ?>,
             alcData = <?php echo json_encode($data) ?>,
-            // bounds = new google.maps.LatLngBounds(),
+            bounds = new google.maps.LatLngBounds(),
             mapStyle = [
               {
                 "stylers": [
@@ -131,29 +131,34 @@ function alc_member_map_shortcode( $atts ) {
           // Markers
 
           // Display multiple markers on a map
-          var infoWindow = new google.maps.InfoWindow(), alc, i;
+          var infoWindow = new google.maps.InfoWindow(), alcMarker;
 
           // Loop through our array of markers & place each one on the map  
-          for( i = 0; i < alcData.length; i++ ) {
+          for (var i in alcData) {
+              // skip if on map is not set or no geocode is present
+              if (alcData[i].alc_map_info_on_map != 1 || typeof alcData[i].alc_map_info_geocode == 'undefined') { continue; }
+              
+              console.log(alcData[i].alc_map_info_on_map);
+
               var geolocation = alcData[i].alc_map_info_geocode.split(',');
               var position = new google.maps.LatLng(geolocation[0], geolocation[1]);
-              // bounds.extend(position);
-              alc = new google.maps.Marker({
+              bounds.extend(position);
+              alcMarker = new google.maps.Marker({
                   position: position,
                   map: map,
-                  title: alcData[i]['alc_map_info_name']
+                  title: alcData[i]['alc_map_info_name'],
               });
               
               // Allow each marker to have an info window    
-              google.maps.event.addListener(alc, 'click', (function(alc, i) {
+              google.maps.event.addListener(alcMarker, 'click', (function(alcMarker, i) {
                   return function() {
                       infoWindow.setContent(alcData[i]['infoWindowContent']);
-                      infoWindow.open(map, alc);
+                      infoWindow.open(map, alcMarker);
                   }
-              })(alc, i));
+              })(alcMarker, i));
 
               // Automatically center the map fitting all markers on the screen
-              // map.fitBounds(bounds);
+              map.fitBounds(bounds);
           }
 
           // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
