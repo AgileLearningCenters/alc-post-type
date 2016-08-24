@@ -12,3 +12,182 @@ function alc_post_type_admin_script() {
 
 add_action( 'admin_print_scripts-post-new.php', 'alc_post_type_admin_script', 11 );
 add_action( 'admin_print_scripts-post.php', 'alc_post_type_admin_script', 11 );
+
+// Map creation metabox
+
+function alc_member_map_shortcode( $atts ) {
+    $a = shortcode_atts( array(
+        'target' => false,
+        'class' => 'map',
+        'zoom' => 3,
+        'mapWidth' => '100%',
+        'mapHeight' => '400px',
+        'centerLat' => '30.136093332022153',
+        'centerLng' => '-100.47842740624996',
+    ), $atts );
+
+    // global $geocodeAPIKey;
+    // wp_enqueue_script( 'google-maps-api', 'https://maps.googleapis.com/maps/api/js?key=' . $geocodeAPIKey, array(), null, false );
+
+    // Query ALCs
+
+    $args = array(
+        'post_type' => 'alc',
+        'post_status' => 'publish'
+    );
+
+    $string = '';
+    $alcs = get_posts( $args );
+    $data = array();
+    
+    if($alcs){
+      foreach ( $alcs as $alc ) {
+          $map_meta = array();
+
+          // update_meta_cache()???
+          foreach (get_post_meta($alc->ID) as $key => $value) {
+            $match = 'alc_map_info';
+            if (substr($key, 0, strlen($match)) === $match) {
+              $map_meta[$key] = (is_array($value)) ? implode(' ', $value) : $value ;
+            }
+          }
+
+          $infoWindow = '<h1>' . $map_meta['alc_map_info_name'] . '</h1>';
+          $infoWindow .= '<p>' . $map_meta['alc_map_info_description'] . '</p>';
+          if (isset($map_meta['alc_map_info_cta'])) {
+            $infoWindow .= '<p><a class="button" href="' . $map_meta['alc_map_info_cta'] . '">' . $map_meta['alc_map_info_cta_label'] . '</a></p>';
+          }
+
+          $map_meta['infoWindowContent'] = $infoWindow;
+          // Merge meta data and post data
+          $data[$alc->post_name] = array_merge(get_object_vars($alc),$map_meta);
+      }
+    }
+
+    // Create Script
+
+    $id = ( $a['target'] ) ? $a['target'] : 'alc-map-' . substr( sha1( "Pickle Pie" . time() ), rand( 2, 10 ), rand( 5, 8 ) );
+    $out = ( $a['target'] ) ? '' : '<div class="' . $a['class'] . '" id="' . $id . '"></div>';
+
+    ob_start();
+      ?>
+
+      <script type='text/javascript'>
+      function initialize() {
+        var targetDiv = '<?php echo $id ?>',
+            settings = <?php echo json_encode($a) ?>,
+            alcData = <?php echo json_encode($data) ?>,
+            // bounds = new google.maps.LatLngBounds(),
+            mapStyle = [
+              {
+                "stylers": [
+                  { "weight": 0.2 },
+                  { "saturation": -73 }
+                ]
+              },{
+                "featureType": "poi",
+                "stylers": [
+                  { "visibility": "off" }
+                ]
+              },{
+                "featureType": "water",
+                "stylers": [
+                  { "visibility": "on" },
+                  { "lightness": -63 },
+                  { "hue": "#00aaff" }
+                ]
+              }
+            ];
+          
+          console.log(settings);
+          console.log(alcData);
+
+          google.maps.visualRefresh = true;
+          var isMobile = (navigator.userAgent.toLowerCase().indexOf('android') > -1) ||
+            (navigator.userAgent.match(/(iPod|iPhone|iPad|BlackBerry|Windows Phone|iemobile)/));
+          if (isMobile) {
+            var viewport = document.querySelector("meta[name=viewport]");
+            viewport.setAttribute('content', 'initial-scale=1.0, user-scalable=no');
+          }
+
+          // construction
+          
+          var mapDiv = document.getElementById(targetDiv);
+          mapDiv.style.width = isMobile ? '100%' : settings.mapWidth;
+          mapDiv.style.height = isMobile ? '100%' : settings.mapHeight;
+          
+          var map = new google.maps.Map(mapDiv, {
+            center: new google.maps.LatLng(settings.centerLat,settings.centerLng),
+            zoom: settings.zoom,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            streetViewControl: false,
+            scrollwheel: false,
+            styles: mapStyle
+          });
+
+          map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend-open'));
+          map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend'));
+          
+          // Markers
+
+          // Display multiple markers on a map
+          var infoWindow = new google.maps.InfoWindow(), alc, i;
+
+          // Loop through our array of markers & place each one on the map  
+          for( i = 0; i < alcData.length; i++ ) {
+              var geolocation = alcData[i].alc_map_info_geocode.split(',');
+              var position = new google.maps.LatLng(geolocation[0], geolocation[1]);
+              // bounds.extend(position);
+              alc = new google.maps.Marker({
+                  position: position,
+                  map: map,
+                  title: alcData[i]['alc_map_info_name']
+              });
+              
+              // Allow each marker to have an info window    
+              google.maps.event.addListener(alc, 'click', (function(alc, i) {
+                  return function() {
+                      infoWindow.setContent(alcData[i]['infoWindowContent']);
+                      infoWindow.open(map, alc);
+                  }
+              })(alc, i));
+
+              // Automatically center the map fitting all markers on the screen
+              // map.fitBounds(bounds);
+          }
+
+          // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+          // var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+          //     this.setZoom(14);
+          //     google.maps.event.removeListener(boundsListener);
+          // });
+
+          // mobile
+
+          if (isMobile) {
+            var legend = document.getElementById('googft-legend');
+            var legendOpenButton = document.getElementById('googft-legend-open');
+            var legendCloseButton = document.getElementById('googft-legend-close');
+            legend.style.display = 'none';
+            legendOpenButton.style.display = 'block';
+            legendCloseButton.style.display = 'block';
+            legendOpenButton.onclick = function() {
+              legend.style.display = 'block';
+              legendOpenButton.style.display = 'none';
+            }
+            legendCloseButton.onclick = function() {
+              legend.style.display = 'none';
+              legendOpenButton.style.display = 'block';
+            }
+          }
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+      </script>
+
+      <?php
+      $out .= ob_get_clean();
+    
+    return '<script src="https://maps.google.com/maps/api/js?sensor=false&amp;v=3" type="text/javascript"></script>' . $out;
+}
+
+add_shortcode( 'alc_member_map', 'alc_member_map_shortcode' );
