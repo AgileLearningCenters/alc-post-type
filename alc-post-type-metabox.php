@@ -176,7 +176,7 @@ $metaboxes = array(
         'type'  => 'checkbox'
       ),
       array(
-        'id' => 'description',
+        'id' => 'details',
         'label' => __( 'Details about your exchange program', 'alc_text' ),
         'type' => 'textarea',
       )
