@@ -1,48 +1,57 @@
 ( function( $ ) {
   jQuery(document).ready(function($) {
 
-    function alcGeocodeAddress(addressId,geocodeId){
+    var geocodeButtonId = '#geocodeButton';
+
+    function formatAddress(addressStr,delineator){
+      var delineator = (typeof delineator == 'undefined') ? '|' : delineator,
+          addressArray = addressStr.split(delineator);
+
+          addressArray.splice(1,1);
+
+          return [ addressArray.join('+'), addressArray];
+    }
+
+    function geocodeAddress(addressId,geocodeId){
       var addressId = (typeof addressId == 'undefined') ? '#address' : addressId,
           geocodeId = (typeof geocodeId == 'undefined') ? '#geocode' : geocodeId,
           geocoder = new google.maps.Geocoder(),
-          address = $(addressId).val().split('|');
+          address = formatAddress($(addressId).val());
 
-      // Remove Address line 2 from array
-      address.splice(1,1);
-
-      geocoder.geocode({ 'address': address.join('+') }, function (results, status) {
+      geocoder.geocode({ 'address': address[0] }, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
           var geolocation = results[0].geometry.location,
-              geocodeLatLng = geolocation.lat() + ',' + geolocation.lng();
+              geocodeLatLng = ([geolocation.lat(),geolocation.lng()]).join(',');
           
           $(geocodeId).val(geocodeLatLng);
 
-          $('#geocodeButton').after('<p><img src="' + alcStaticMapURL(geocodeLatLng) + '"></p>');
+          $(geocodeButtonId).after('<p><img src="' + alcStaticMapURL(geocodeLatLng) + '"></p>');
         }
         else {
-          console.log("Geocoding failed: " + status + ' | address:' + address.join('+'));
+          console.log("Geocoding failed: " + status + ' | address:' + address[0]);
         }
       });
 
     }
 
-    function alcStaticMapURL(geocode){
+    function alcStaticMapURL(geocode, mapObject){
       var baseurl = 'https://maps.googleapis.com/maps/api/staticmap',
           apikey = 'AIzaSyCXre9Yr0X1YQpFZJpXWIWN8ZOVTHZUjvU';
-      var mapObject = {
+      var defaults = {
         'center':geocode,
         'size':'600x200',
         'zoom':'8',
         'maptype':'roadmap',
-        'markers':'color:blue|label:A|' + geocode,
+        'markers':'color:red|' + geocode,
         'key':apikey
       };
+      var mapObject = $.extend({}, defaults, mapObject || {});
 
       return baseurl + '?' + $.param( mapObject );
     }
 
-    $('#geocodeButton').click(function(){
-      alcGeocodeAddress();
+    $(geocodeButtonId).click(function(){
+      geocodeAddress();
     });
 
   });
