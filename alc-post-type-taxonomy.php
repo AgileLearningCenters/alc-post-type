@@ -110,22 +110,15 @@ add_filter('upload_mimes', 'cc_mime_types');
 add_action( 'alc-type_add_form_fields', 'type_add_group_field', 10, 2 );
 function type_add_group_field($taxonomy) {
     ?>
-          <tr class="form-field">
-            <th scope="row" valign="top"><label for="meta-order"><?php _e( 'Map Icon', 'alc_text' ); ?></label></th>
-            <td>
-                <div id="mapIcon">
+    <div class="form-field term-map-icon">
+        <label for="type-map-icon"><?php _e( 'Map Icon', 'alc_text' ); ?></label>
+        <!-- Define our actual upload field -->
+        <input type="file" name="type-map-icon" value="" />
+        <p class="description"><?php _e( 'This currently doesn\'t work, create taxonomy and edit it to add image','alc_text' ); ?></p>
+    </div>
 
-                    <!-- Create a nonce to validate against -->
-                    <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
-
-                    <!-- Define our actual upload field -->
-                    <label for="type-map-icon"><?php _e('Upload an SVG', 'alc_text') ?></label>
-                    <input type="file" name="type-map-icon" value="" />
-
-                </div>
-                <span class="description"><?php _e( 'Upload an appropriate image.', 'alc_text' ); ?></span>
-        </td> 
-    </tr>
+    <!-- Create a nonce to validate against -->
+    <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
 <?php
 }
 
