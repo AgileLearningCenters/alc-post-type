@@ -119,8 +119,8 @@ function type_add_group_field($taxonomy) {
                     <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
 
                     <!-- Define our actual upload field -->
-                    <label for="_uploaded_file"><?php _e('Upload an SVG', 'alc_text') ?></label>
-                    <input type="file" name="_uploaded_file" value="" />
+                    <label for="type-map-icon"><?php _e('Upload an SVG', 'alc_text') ?></label>
+                    <input type="file" name="type-map-icon" value="" />
 
                 </div>
                 <span class="description"><?php _e( 'Upload an appropriate image.', 'alc_text' ); ?></span>
@@ -133,9 +133,9 @@ add_action( 'alc-type_edit_form_fields', 'type_edit_group_field', 10, 2 );
 function type_edit_group_field( $term, $taxonomy ){
         var_dump($term);
         // Retrieve our Attachment ID from the post_meta Database Table
-        $uploadID   = get_term_meta( $term->term_id, '_term_image', true );
+        $uploadID   = get_term_meta( $term->term_id, 'type_map_icon', true );
         // Retrieve any upload feedback from the Optoins Database Table
-        $feedback   = get_term_meta( $term->term_id, '_term_image_feedback', true );
+        $feedback   = get_term_meta( $term->term_id, 'type_map_icon_feedback', true );
           ?>
 
           <tr class="form-field">
@@ -147,8 +147,8 @@ function type_edit_group_field( $term, $taxonomy ){
                     <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
 
                     <!-- Define our actual upload field -->
-                    <label for="_uploaded_file"><?php _e('Upload an SVG', 'alc_text') ?></label>
-                    <input type="file" name="_uploaded_file" value="" />
+                    <label for="type-map-icon"><?php _e('Upload an SVG', 'alc_text') ?></label>
+                    <input type="file" name="type-map-icon" value="" />
 
                     <?php 
                           if( is_numeric( $uploadID ) ) : // IF our upload ID is actually numeric, proceed
@@ -194,32 +194,32 @@ function type_edit_group_field( $term, $taxonomy ){
 
           <?php
         /** Since we've shown the user the feedback they need to see, we can delete our meta **/
-        delete_term_meta( $term->term_id, '_term_image_feedback' );
+        // delete_term_meta( $term->term_id, 'type_map_icon_feedback' );
 }
 
 add_action( 'created_alc-type', 'type_save_meta', 10, 2 );
 add_action( 'edited_alc-type', 'type_save_meta', 10, 2 );
 function type_save_meta( $term_id, $tt_id ){
-
+    $uploadFeedback = __('Upload attempted','alc_text');
     // Make sure that the nonce is set, taxonomy is set, and that our uploaded file is not empty
     if(
       isset( $_POST['upload_meta_nonce'] ) && 
       wp_verify_nonce( $_POST['upload_meta_nonce'], basename( __FILE__ ) ) &&
       isset( $_POST['taxonomy'] ) && 
-      isset( $_FILES['_uploaded_file'] ) && 
-      !empty( $_FILES['_uploaded_file'] )
+      isset( $_FILES['type-map-icon'] ) && 
+      !empty( $_FILES['type-map-icon'] )
       ) {
         // Only accept image mime types. - List of mimetypes: http://en.wikipedia.org/wiki/Internet_media_type
         $supportedTypes = array( 'image/svg+xml', 'image/png' );
         // Get the mime type and extension.
-        $fileArray      = wp_check_filetype( basename( $_FILES['_uploaded_file']['name'] ) );
+        $fileArray      = wp_check_filetype( basename( $_FILES['type-map-icon']['name'] ) );
         // Store our file type
         $fileType       = $fileArray['type'];
 
         // Verify that the type given is what we're expecting
         if( in_array( $fileType, $supportedTypes ) ) {
             // Let WordPress handle the upload
-            $uploadStatus = wp_handle_upload( $_FILES['_uploaded_file'], array( 'test_form' => false ) );
+            $uploadStatus = wp_handle_upload( $_FILES['type-map-icon'], array( 'test_form' => false ) );
 
             // Make sure that the file was uploaded correctly, without error
             if( isset( $uploadStatus['file'] ) ) {
@@ -241,17 +241,17 @@ function type_save_meta( $term_id, $tt_id ){
 
 
                 // IF a file already exists in this meta, grab it
-                $existingImage = get_term_meta( $term_id, '_term_image', true );
+                $existingImage = get_term_meta( $term_id, 'type_map_icon', true );
                 // IF the meta does exist, delete it.
                 if( ! empty( $existingImage ) && is_numeric( $existingImage ) ) {
                     wp_delete_attachment( $existingImage );
                     // Update our meta with the new attachment ID
-                    update_term_meta( $term_id, '_term_image', $imageID );
+                    update_term_meta( $term_id, 'type_map_icon', $imageID );
                     // Just in case there's a feedback meta, delete it
-                    delete_term_meta( $term_id, '_term_image_feedback' );
+                    delete_term_meta( $term_id, 'type_map_icon_feedback' );
                 } else {
                     // If a file doesn't exist add the meta
-                    add_term_meta( $term_id, '_term_image', $imageID );
+                    add_term_meta( $term_id, 'type_map_icon', $imageID );
                 }
 
             }
@@ -267,7 +267,7 @@ function type_save_meta( $term_id, $tt_id ){
 
         // Update our Feedback meta
         if( isset( $uploadFeedback ) ) {
-            update_term_meta( $term_id, '_term_image_feedback', $uploadFeedback );
+            update_term_meta( $term_id, 'type_map_icon_feedback', $uploadFeedback );
         }
     }
 }
