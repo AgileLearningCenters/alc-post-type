@@ -99,175 +99,203 @@ function edit_form_tag( ) { echo ' enctype="multipart/form-data"'; }
 add_action( 'alc-type_term_edit_form_tag' , 'edit_form_tag' );
 add_action( 'alc-type_term_new_form_tag' , 'edit_form_tag' );
 
-// allow for SVG upload
-function cc_mime_types($mimes) {
-  $mimes['svg'] = 'image/svg+xml';
-  return $mimes;
-}
-add_filter('upload_mimes', 'cc_mime_types');
+/**
+ * Thanks https://catapultthemes.com/adding-an-image-upload-field-to-categories/
+ **/
+if ( ! class_exists( 'ALC_TYPE_MAP_ICON' ) ) {
 
-// add form element to taxonomy
-add_action( 'alc-type_add_form_fields', 'type_add_group_field', 10, 2 );
-function type_add_group_field($taxonomy) {
-    ?>
-    <div class="form-field term-map-icon">
-        <label for="type-map-icon"><?php _e( 'Map Icon', 'alc_text' ); ?></label>
-        <!-- Define our actual upload field -->
-        <input type="file" name="type-map-icon" value="" />
-        <p class="description"><?php _e( 'This currently doesn\'t work, create taxonomy and edit it to add image','alc_text' ); ?></p>
-    </div>
+class ALC_TYPE_MAP_ICON {
 
-    <!-- Create a nonce to validate against -->
-    <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
-<?php
-}
+    public function __construct() {
+    //
+    }
 
-add_action( 'alc-type_edit_form_fields', 'type_edit_group_field', 10, 2 );
-function type_edit_group_field( $term, $taxonomy ){
-        var_dump($term);
-        // Retrieve our Attachment ID from the post_meta Database Table
-        $uploadID   = get_term_meta( $term->term_id, 'type_map_icon', true );
-        // Retrieve any upload feedback from the Optoins Database Table
-        $feedback   = get_term_meta( $term->term_id, 'type_map_icon_feedback', true );
-          ?>
+    /*
+    * Initialize the class and start calling our hooks and filters
+    * @since 1.0.0
+    */
+    public function init() {
+        add_action( 'alc-type_add_form_fields', array ( $this, 'add_type_icon' ), 10, 2 );
+        add_action( 'created_alc-type', array ( $this, 'save_type_icon' ), 10, 2 );
+        add_action( 'alc-type_edit_form_fields', array ( $this, 'update_type_icon' ), 10, 2 );
+        add_action( 'edited_alc-type', array ( $this, 'updated_type_icon' ), 10, 2 );
+        add_action( 'admin_enqueue_scripts', array ( $this, 'load_wp_media_files' ) );
+        add_action( 'admin_footer', array ( $this, 'add_script' ) );
+        
+        add_filter( 'upload_mimes', array ( $this, 'add_mime_types' ) );
+        add_filter( 'manage_edit-alc-type_columns', array ( $this, 'add_group_column' ) );
+        add_filter( 'manage_alc-type_custom_column', array ( $this, 'add_group_column_content' ), 10, 3 );
+    }
 
-          <tr class="form-field">
-            <th scope="row" valign="top"><label for="meta-order"><?php _e( 'Map Icon', 'alc_text' ); ?></label></th>
-            <td>
-                <div id="mapIcon">
+    /*
+    * Enqueue media script for file upload
+    * @since 1.0.0
+    */
+    public function load_wp_media_files() {
+        wp_enqueue_media();
+    }
 
-                    <!-- Create a nonce to validate against -->
-                    <input type="hidden" name="upload_meta_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) ); ?>" />
+    /*
+    * Allow for SVG upload
+    * @since 1.0.0
+    */
+    function add_mime_types($mimes) {
+      $mimes['svg'] = 'image/svg+xml';
+      return $mimes;
+    }
 
-                    <!-- Define our actual upload field -->
-                    <label for="type-map-icon"><?php _e('Upload an SVG', 'alc_text') ?></label>
-                    <input type="file" name="type-map-icon" value="" />
+    /*
+    * Add a form field in the new taxonomy page
+    * @since 1.0.0
+    */
+    public function add_type_icon ( $taxonomy ) { ?>
+        <div class="form-field term-group">
+         <label for="type-icon-id"><?php _e('Map Icon', 'alc_text'); ?></label>
+         <input type="hidden" id="type-icon-id" name="type-icon-id" class="custom_media_url" value="">
+         <div id="type-icon-wrapper"></div>
+         <p>
+           <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Map Icon', 'alc_text' ); ?>" />
+           <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Map Icon', 'alc_text' ); ?>" />
+        </p>
+         <p><?php _e('For best results use SVG or PNG file', 'alc_text'); ?></p>
+        </div>
+    <?php
+    }
 
-                    <?php 
-                          if( is_numeric( $uploadID ) ) : // IF our upload ID is actually numeric, proceed
-
-                            /***
-                            /*  In this case we are pulling an image, if we are uploading
-                            /*  something such as a PDF we could use the built-in function
-                            /*  wp_get_attachment_url( $id );
-                            /*  codex.wordpress.org/Function_Reference/wp_get_attachment_url
-                            ***/
-                            $imageArr = wp_get_attachment_url( $uploadID );     // Get the URL of file
-                            $imageURL = $imageArr;                             // wp_get_attachment_image_src() returns an array, index 0 is our URL
-                            ?>
-
-                            <div id="uploaded_image">
-                                <a href="post.php?post=<?php echo $uploadID; ?>&action=edit" target="_blank">Edit Image</a><br />
-
-                                <!-- Display our image using the URL retrieved earlier -->
-                                <a href="post.php?post=<?php echo $uploadID; ?>&action=edit" target="_blank"><img src="<?php echo $imageURL; ?>" /></a><br /><br />
-                            </div>
-
-                            <!-- IF we received feedback, something went wrong and we need to show that feedback. -->               
-                    <?php elseif( ! empty( $feedback ) ) : ?>
-
-                        <p style="color:red;font-size:12px;font-weight;bold;font-style:italic;"><?php echo $feedback; ?></p>
-
-                    <?php endif; ?>
-
-                </div>
-                <span class="description"><?php _e( 'Upload an appropriate image.' ); ?></span>
-                <br />
-                <br />
-
-                <!-- This link is for our deletion process -->
-                <?php if( ! empty( $uploadID ) ) : ?>
-
-                <a href="javascript:void(0)" class="deleteImage" style="color:red;text-decoration:underline;">Delete</a>
-
-            <?php endif; ?>
-
-        </td> 
-    </tr>
-
-          <?php
-        /** Since we've shown the user the feedback they need to see, we can delete our meta **/
-        // delete_term_meta( $term->term_id, 'type_map_icon_feedback' );
-}
-
-add_action( 'created_alc-type', 'type_save_meta', 10, 2 );
-add_action( 'edited_alc-type', 'type_save_meta', 10, 2 );
-function type_save_meta( $term_id, $tt_id ){
-    $uploadFeedback = __('Upload attempted','alc_text');
-    // Make sure that the nonce is set, taxonomy is set, and that our uploaded file is not empty
-    if(
-      isset( $_POST['upload_meta_nonce'] ) && 
-      wp_verify_nonce( $_POST['upload_meta_nonce'], basename( __FILE__ ) ) &&
-      isset( $_POST['taxonomy'] ) && 
-      isset( $_FILES['type-map-icon'] ) && 
-      !empty( $_FILES['type-map-icon'] )
-      ) {
-        // Only accept image mime types. - List of mimetypes: http://en.wikipedia.org/wiki/Internet_media_type
-        $supportedTypes = array( 'image/svg+xml', 'image/png' );
-        // Get the mime type and extension.
-        $fileArray      = wp_check_filetype( basename( $_FILES['type-map-icon']['name'] ) );
-        // Store our file type
-        $fileType       = $fileArray['type'];
-
-        // Verify that the type given is what we're expecting
-        if( in_array( $fileType, $supportedTypes ) ) {
-            // Let WordPress handle the upload
-            $uploadStatus = wp_handle_upload( $_FILES['type-map-icon'], array( 'test_form' => false ) );
-
-            // Make sure that the file was uploaded correctly, without error
-            if( isset( $uploadStatus['file'] ) ) {
-                require_once(ABSPATH . "wp-admin" . '/includes/image.php');
-
-                // Let's add the image to our media library so we get access to metadata
-                $imageID = wp_insert_attachment( array(
-                    'post_mime_type'    => $uploadStatus['type'],
-                    'post_title'        => preg_replace( '/\.[^.]+$/', '', basename( $uploadStatus['file'] ) ),
-                    'post_content'      => '',
-                    'post_status'       => 'publish'
-                    ),
-                $uploadStatus['file']
-                );
-
-                // Generate our attachment metadata then update the file.
-                $attachmentData = wp_generate_attachment_metadata( $imageID, $uploadStatus['file'] );
-                wp_update_attachment_metadata( $imageID,  $attachmentData );
-
-
-                // IF a file already exists in this meta, grab it
-                $existingImage = get_term_meta( $term_id, 'type_map_icon', true );
-                // IF the meta does exist, delete it.
-                if( ! empty( $existingImage ) && is_numeric( $existingImage ) ) {
-                    wp_delete_attachment( $existingImage );
-                    // Update our meta with the new attachment ID
-                    update_term_meta( $term_id, 'type_map_icon', $imageID );
-                    // Just in case there's a feedback meta, delete it
-                    delete_term_meta( $term_id, 'type_map_icon_feedback' );
-                } else {
-                    // If a file doesn't exist add the meta
-                    add_term_meta( $term_id, 'type_map_icon', $imageID );
-                }
-
-            }
-            else {
-                // Something major went wrong, enable debugging
-                $uploadFeedback = 'There was a problem with your uploaded file. Contact Administrator.';
-            }
-        }
-        else {
-            // Wrong file type
-            $uploadFeedback = __('File must be SVG or PNG','alc_text');
-        }
-
-        // Update our Feedback meta
-        if( isset( $uploadFeedback ) ) {
-            update_term_meta( $term_id, 'type_map_icon_feedback', $uploadFeedback );
+    /*
+    * Save the form field
+    * @since 1.0.0
+    */
+    public function save_type_icon ( $term_id, $tt_id ) {
+        if( isset( $_POST['type-icon-id'] ) && '' !== $_POST['type-icon-id'] ){
+         $image = $_POST['type-icon-id'];
+         add_term_meta( $term_id, 'type-icon-id', $image, true );
         }
     }
+
+    /*
+    * Edit the form field
+    * @since 1.0.0
+    */
+    public function update_type_icon ( $term, $taxonomy ) { ?>
+        <tr class="form-field term-group-wrap">
+         <th scope="row">
+           <label for="type-icon-id"><?php _e( 'Map Icon', 'alc_text' ); ?></label>
+         </th>
+         <td>
+           <?php $image_id = get_term_meta ( $term -> term_id, 'type-icon-id', true ); ?>
+           <input type="hidden" id="type-icon-id" name="type-icon-id" value="<?php echo $image_id; ?>">
+           <div id="type-icon-wrapper">
+             <?php if ( $image_id ) { ?>
+             <img class="custom_media_image" src="<?php echo wp_get_attachment_url ( $image_id ); ?>" style="margin:0;padding:0;max-height:100px;max-width:100px;" />
+             <?php } ?>
+           </div>
+           <p>
+             <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Map Icon', 'alc_text' ); ?>" />
+             <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Map Icon', 'alc_text' ); ?>" />
+           </p>
+           <p class="description"><?php _e('For best results use SVG or PNG file', 'alc_text'); ?></p>
+         </td>
+        </tr>
+    <?php
+    }
+
+    /*
+    * Update the form field value
+    * @since 1.0.0
+    */
+    public function updated_type_icon ( $term_id, $tt_id ) {
+        if( isset( $_POST['type-icon-id'] ) && '' !== $_POST['type-icon-id'] ){
+            $image = $_POST['type-icon-id'];
+            update_term_meta ( $term_id, 'type-icon-id', $image );
+        } else {
+            update_term_meta ( $term_id, 'type-icon-id', '' );
+        }
+    }
+
+    /*
+    * Add script
+    * @since 1.0.0
+    */
+    public function add_script() { ?>
+    <script>
+     jQuery(document).ready( function($) {
+       function type_icon_upload(button_class) {
+         var _custom_media = true,
+             _orig_send_attachment = wp.media.editor.send.attachment;
+         $('body').on('click', button_class, function(e) {
+           var button_id = '#'+$(this).attr('id');
+           var send_attachment_bkp = wp.media.editor.send.attachment;
+           var button = $(button_id);
+           _custom_media = true;
+           wp.media.editor.send.attachment = function(props, attachment){
+            console.log(attachment);
+             if ( _custom_media ) {
+               $('#type-icon-id').val(attachment.id);
+                console.log(attachment.id);
+               $('#type-icon-wrapper').html('<img class="custom_media_image" src="" style="margin:0;padding:0;max-height:100px;max-width:100px;" />');
+               $('#type-icon-wrapper .custom_media_image').attr('src', attachment.url).css('display','block');
+             } else {
+               return _orig_send_attachment.apply( button_id, [props, attachment] );
+             }
+            }
+         wp.media.editor.open();
+         return false;
+       });
+     }
+     type_icon_upload('.ct_tax_media_button.button'); 
+     $('body').on('click','.ct_tax_media_remove',function(){
+       $('#type-icon-id').val('');
+       $('#type-icon-wrapper').html('<img class="custom_media_image" src="" style="margin:0;padding:0;max-height:100px;float:none;" />');
+     });
+     // Thanks: http://stackoverflow.com/questions/15281995/wordpress-create-category-ajax-response
+     $(document).ajaxComplete(function(event, xhr, settings) {
+       var queryStringArr = settings.data.split('&');
+       if( $.inArray('action=add-tag', queryStringArr) !== -1 ){
+         var xml = xhr.responseXML;
+         $response = $(xml).find('term_id').text();
+         if($response!=""){
+           // Clear the thumb image
+           $('#type-icon-wrapper').html('');
+         }
+       }
+     });
+    });
+    </script>
+    <?php }
+
+    /*
+    * Add column to taxonomy display
+    * @since 1.0.0
+    */
+    public function add_group_column( $columns ){
+        $columns['type-icon'] = __( 'Map Icon', 'alc_text' );
+        return $columns;
+    }
+
+    /*
+    * Enqueue media script for file upload
+    * @since 1.0.0
+    */
+    public function add_group_column_content( $content, $column_name, $term_id ){
+
+        if( $column_name !== 'type-icon' ){
+            return $content;
+        }
+
+        $term_id = absint( $term_id );
+        $attachment_id = get_term_meta( $term_id, 'type-icon-id', true );
+
+        if( !empty( $attachment_id ) ){
+            $content .= '<img class="type-map-icon" src="' . wp_get_attachment_url ( $attachment_id ) . '" style="margin:0;padding:0;max-height:100px;max-width:100px;" />';
+        }
+
+        return $content;
+    }
+
 }
 
-// // add column to taxonomy list
-// add_filter('manage_edit-alc-type_columns', 'type_add_group_column' );
-// function type_add_group_column( $columns ){}
+$ALC_TYPE_MAP_ICON = new ALC_TYPE_MAP_ICON();
+$ALC_TYPE_MAP_ICON -> init();
 
-// add_filter('manage_alc-type_custom_column', 'type_add_group_column_content', 10, 3 );
-// function type_add_group_column_content( $content, $column_name, $term_id ){}
+}
