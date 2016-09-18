@@ -44,11 +44,18 @@ function alc_member_map_shortcode( $atts ) {
       foreach ( $alcs as $alc ) {
           $map_meta = array();
 
+          $map_meta['alcType'] = (array) array_shift( wp_get_post_terms($alc->ID, 'alc-type') );
+          $map_icon_id = get_term_meta( $map_meta['alcType']['term_id'], 'type-icon-id', true );
+          $map_meta['alcType']['mapIcon'] = array(
+            'id' => $map_icon_id,
+            'url' => wp_get_attachment_url( $map_icon_id )
+          );
+
           // update_meta_cache()???
           foreach (get_post_meta($alc->ID) as $key => $value) {
             $match = 'alc_map_info';
-            if (substr($key, 0, strlen($match)) === $match) {
               $map_meta[$key] = (is_array($value)) ? implode(' ', $value) : $value ;
+            if (substr($key, 0, strlen($match)) === $match) {
             }
           }
 
@@ -98,9 +105,6 @@ function alc_member_map_shortcode( $atts ) {
                 ]
               }
             ];
-          
-          console.log(settings);
-          console.log(alcData);
 
           google.maps.visualRefresh = true;
           var isMobile = (navigator.userAgent.toLowerCase().indexOf('android') > -1) ||
@@ -138,7 +142,12 @@ function alc_member_map_shortcode( $atts ) {
               // skip if on map is not set or no geocode is present
               if (alcData[i].alc_map_info_on_map != 1 || typeof alcData[i].alc_map_info_geocode == 'undefined') { continue; }
               
-              console.log(alcData[i].alc_map_info_on_map);
+              var image = {
+                url: alcData[i].alcType.mapIcon.url,
+                scaledSize: new google.maps.Size(35,55),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 55)
+              }
 
               var geolocation = alcData[i].alc_map_info_geocode.split(',');
               var position = new google.maps.LatLng(geolocation[0], geolocation[1]);
@@ -146,7 +155,9 @@ function alc_member_map_shortcode( $atts ) {
               alcMarker = new google.maps.Marker({
                   position: position,
                   map: map,
-                  title: alcData[i]['alc_map_info_name'],
+                  title: alcData[i].alc_map_info_name,
+                  // icon: image,
+                  icon: alcData[i].alcType.mapIcon.url
               });
               
               // Allow each marker to have an info window    
@@ -159,6 +170,7 @@ function alc_member_map_shortcode( $atts ) {
 
               // Automatically center the map fitting all markers on the screen
               map.fitBounds(bounds);
+              // map.setZoom(map.getZoom() + 1);
           }
 
           // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
