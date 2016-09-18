@@ -18,6 +18,7 @@ add_action( 'admin_print_scripts-post.php', 'alc_post_type_admin_script', 11 );
 function alc_member_map_shortcode( $atts ) {
     $a = shortcode_atts( array(
         'target' => false,
+        'legend' => true,
         'class' => 'map',
         'zoom' => 3,
         'mapWidth' => '100%',
@@ -74,6 +75,7 @@ function alc_member_map_shortcode( $atts ) {
     // Create Script
 
     $id = ( $a['target'] ) ? $a['target'] : 'alc-map-' . substr( sha1( "Pickle Pie" . time() ), rand( 2, 10 ), rand( 5, 8 ) );
+    $legend = $id . '-legend';
     $out = ( $a['target'] ) ? '' : '<div class="' . $a['class'] . '" id="' . $id . '"></div>';
 
     ob_start();
@@ -82,6 +84,7 @@ function alc_member_map_shortcode( $atts ) {
       <script type='text/javascript'>
       function initialize() {
         var targetDiv = '<?php echo $id ?>',
+            legendTarget = '<?php echo $legend ?>',
             settings = <?php echo json_encode($a) ?>,
             alcData = <?php echo json_encode($data) ?>,
             bounds = new google.maps.LatLngBounds(),
@@ -125,17 +128,21 @@ function alc_member_map_shortcode( $atts ) {
             zoom: settings.zoom,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             streetViewControl: false,
+            mapTypeControl: false,
+            zoomControlOptions: {
+              style: google.maps.ZoomControlStyle.SMALL,
+              position: google.maps.ControlPosition.LEFT_TOP
+            },
             scrollwheel: false,
             styles: mapStyle
           });
-
-          map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend-open'));
-          map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend'));
           
           // Markers
 
           // Display multiple markers on a map
-          var infoWindow = new google.maps.InfoWindow(), alcMarker;
+          var infoWindow = new google.maps.InfoWindow(), 
+              icons = {},
+              alcMarker;
 
           // Loop through our array of markers & place each one on the map  
           for (var i in alcData) {
@@ -147,6 +154,11 @@ function alc_member_map_shortcode( $atts ) {
                 scaledSize: new google.maps.Size(35,55),
                 origin: new google.maps.Point(0, 0),
                 anchor: new google.maps.Point(17, 55)
+              }
+
+              // build icons object
+              if ( !(alcData[i].alcType.name in icons) ){
+                icons[alcData[i].alcType.slug] = alcData[i].alcType;
               }
 
               var geolocation = alcData[i].alc_map_info_geocode.split(',');
@@ -172,6 +184,26 @@ function alc_member_map_shortcode( $atts ) {
               map.fitBounds(bounds);
               // map.setZoom(map.getZoom() + 1);
           }
+
+          // draw map legend
+          var legend = document.createElement('div');
+          legend.setAttribute('id',legendTarget);
+          legend.setAttribute('class','alc-map-legend');
+          legend.style.padding = '10px';
+          legend.style.backgroundColor = '#FFF';
+          legend.style.boxShadow = '-2px 2px 4px rgba(0,0,0,.25)';
+
+          for (var key in icons) {
+            var type = icons[key],
+                name = type.name,
+                url = type.mapIcon.url,
+                div = document.createElement('div');
+            div.innerHTML = '<img src="' + url + '" style="max-height:40px"> ' + name;
+            legend.appendChild(div);
+          }
+
+          // set legend position
+          map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(legend);
 
           // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
           // var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
