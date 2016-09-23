@@ -42,7 +42,8 @@ class alc_post_mapping {
   */
   public function map_shortcode_scripts() {
     wp_register_script( 'google-maps-api', 'https://maps.googleapis.com/maps/api/js?key=' . $this->APIKey, array(), null, true );
-    wp_register_script( 'alc-map-js', plugins_url( 'scripts/alc-mapper.js' , __FILE__ ), array('google-maps-api'), '1.0.1', true );
+    wp_register_script( 'google-maps-cluster-api', plugins_url( 'scripts/google-map-markerclusterer.js' , __FILE__ ), array('google-maps-api'), '1.0.1', true );
+    wp_register_script( 'alc-map-js', plugins_url( 'scripts/alc-mapper.js' , __FILE__ ), array('google-maps-api','google-maps-cluster-api'), '1.0.1', true );
   }
 
   /*
@@ -74,7 +75,8 @@ class alc_post_mapping {
         'mapHeight' => '400px',
         'centerLat' => '30.136093332022153',
         'centerLng' => '-100.47842740624996',
-        'defaultIcon' => plugins_url( 'img/map-icon-default.png' , __FILE__ )
+        'defaultIcon' => plugins_url( 'img/map-icon-default.png' , __FILE__ ),
+        'clusterIcon' => plugins_url( 'img/map-icon-cluster' , __FILE__ )
     ), $atts );
 
     $members_data = $this->get_member_data( array( 'settings' => $a ) );

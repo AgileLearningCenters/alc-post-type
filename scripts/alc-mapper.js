@@ -13,6 +13,7 @@ function membersMap ( target, data, options ) {
   this.target = target;
   this.data = data;
   this.bounds = new google.maps.LatLngBounds();
+  this.markers = [];
   // options
   this.settings = jQuery.extend({}, this.constructor.defaults);
   this.setting(options);
@@ -24,11 +25,13 @@ function membersMap ( target, data, options ) {
   //init
   this.build();
   if ( ! this.isNegative(this.settings.markers) ) {
-    this.markers();
+    this.setMarkers();
   }
   if ( ! this.isNegative(this.settings.legend) ) {
-    this.legend();
+    this.setLegend();
   }
+
+  this.setCluster();
 
 }
 
@@ -61,6 +64,11 @@ membersMap.defaults = {
       ]
     }
   ],
+  mcOptions: {
+    style: {
+      url: 'map-icon-cluster'
+    }
+  }
 };
 
 membersMap.prototype = {
@@ -103,7 +111,7 @@ membersMap.prototype = {
       styles: this.settings.style
     });
   },
-  markers:function () {
+  setMarkers:function () {
     // Display multiple markers on a map
     var infoWindow = new google.maps.InfoWindow(),
         marker,
@@ -151,10 +159,11 @@ membersMap.prototype = {
 
         // Automatically center the map fitting all markers on the screen
         this.map.fitBounds(this.bounds);
-        // map.setZoom(map.getZoom() + 1);
+
+        this.markers.push(marker);
     }
   },
-  legend:function(){
+  setLegend:function(){
     // draw map legend
     var legend = document.createElement('div');
     legend.setAttribute('id',this.settings.legend);
@@ -179,6 +188,33 @@ membersMap.prototype = {
     } else {
       this.map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(legend);
     }
+  },
+  setCluster:function(){
+    var options = {
+      imagePath: this.settings.clusterIcon,
+      styles: [{
+        url: this.settings.clusterIcon + 1 + '.png',
+        height: 40,
+        width: 40
+      },{
+        url: this.settings.clusterIcon + 2 + '.png',
+        height: 40,
+        width: 40
+      },{
+        url: this.settings.clusterIcon + 3 + '.png',
+        height: 40,
+        width: 40
+      },{
+        url: this.settings.clusterIcon + 4 + '.png',
+        height: 40,
+        width: 40
+      },{
+        url: this.settings.clusterIcon + 5 + '.png',
+        height: 40,
+        width: 40
+      }]
+    };
+    this.mc = new MarkerClusterer(this.map, this.markers, options);
   }
 
 
