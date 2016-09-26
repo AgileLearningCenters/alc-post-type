@@ -115,22 +115,23 @@ membersMap.prototype = {
     // Display multiple markers on a map
     var infoWindow = new google.maps.InfoWindow(),
         marker,
-        icon;
+        icon = {};
 
     this.icons = {};
 
     // Loop through our array of markers & place each one on the map  
     for (var i in this.data) {
-        // skip if on map is not set or no geocode is present
-        // if (this.data[i].alc_map_info_on_map != 1 || typeof this.data[i].alc_map_info_geocode == 'undefined') { continue; }
         
-        icon = ( typeof this.data[i].type.icon.url !== 'undefined' && this.data[i].type.icon.url != '') ? this.data[i].type.icon.url : this.settings.defaultIcon ;
-        
+        icon.url = this.getIconURL(this.data[i].type.icon.url);
+        icon.w  = 30;
+        icon.h = 46;
+
         var image = {
-          url: icon,
-          scaledSize: new google.maps.Size(35,55),
+          url: icon.url,
+          size: new google.maps.Size(icon.w,icon.h),
+          scaledSize: new google.maps.Size(icon.w,icon.h),
           origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(17, 55)
+          anchor: new google.maps.Point(icon.w / 2, icon.h)
         };
 
         // build icons object
@@ -145,8 +146,7 @@ membersMap.prototype = {
             position: position,
             map: this.map,
             title: this.data[i].alc.map.info_name,
-            // icon: image,
-            icon: icon
+            icon: image,
         });
         
         // Allow each marker to have an info window    
@@ -174,7 +174,7 @@ membersMap.prototype = {
 
     for (var key in this.icons) {
       var type = this.icons[key],
-          url  = ( typeof type.icon.url !== 'undefined' && type.icon.url != '') ? type.icon.url : this.settings.defaultIcon,
+          url  = this.getIconURL( type.icon.url ),
           hgt  = (this.isMobile) ? '10px' : '40px',
           div  = document.createElement('div');
           div.innerHTML = '<img src="' + url + '" style="max-height:' + hgt + '"> ' + type.name;
@@ -189,31 +189,35 @@ membersMap.prototype = {
       this.map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(legend);
     }
   },
+  getIconURL:function(url){
+    return ( typeof url !== 'undefined' && url != '') ? url : this.settings.defaultIcon;
+  },
   setCluster:function(){
-    var options = {
-      imagePath: this.settings.clusterIcon,
-      styles: [{
-        url: this.settings.clusterIcon + 1 + '.png',
-        height: 40,
-        width: 40
-      },{
-        url: this.settings.clusterIcon + 2 + '.png',
-        height: 40,
-        width: 40
-      },{
-        url: this.settings.clusterIcon + 3 + '.png',
-        height: 40,
-        width: 40
-      },{
-        url: this.settings.clusterIcon + 4 + '.png',
-        height: 40,
-        width: 40
-      },{
-        url: this.settings.clusterIcon + 5 + '.png',
-        height: 40,
-        width: 40
-      }]
+    var icon = {
+      h: 50,
+      w: 50,
+      color: 'white',
+      size: 14
     };
+
+    var options = {
+      gridSize: 30,
+      imagePath: this.settings.clusterIcon,
+      styles: []
+    };
+
+    for (var i = 0; i <= 4; i++) {
+      options.styles[i] = {
+        url: this.settings.clusterIcon + (i + 1) + '.png',
+        height: icon.h,
+        width: icon.w,
+        textColor: icon.color,
+        textSize: icon.size
+      };
+    }
+
+    console.log(options);
+
     this.mc = new MarkerClusterer(this.map, this.markers, options);
   }
 

@@ -89,7 +89,7 @@ class alc_post_mapping {
     wp_enqueue_script('alc-map-js');
 
     if ( !isset($atts['target']) ) {
-      return '<div id="' . $a['target'] . '" data-drew="generated"></div>';
+      return '<div id="' . $a['target'] . '"></div>';
     }
 
   }
